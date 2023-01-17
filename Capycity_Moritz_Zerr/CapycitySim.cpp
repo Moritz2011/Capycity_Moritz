@@ -1,7 +1,4 @@
-/*
-    Moritz Zerr
-    14.1.2023 Kapitel 3
-*/
+
 
 #include "CapycitySim.h"
 #include <iostream>
@@ -9,46 +6,13 @@
 #include "Wasserkraftwerk.h"
 #include "Windkraftwerk.h"
 #include "Solarpanele.h"
-
+#include "Blueprint.h"
+#include <algorithm>
 
 using namespace std;
 
-// Konstruktor, in dem der Baubereich gleich initialisiert wird
-CapycitySim::CapycitySim(int r, int c) {
-    rows = r;
-    columns = c;
-    baubereich = new vector<vector<Building> >(rows);
-    // Initialisierung des Baubereichs, zu Beginn alles auf Leer
-    for (int x = 0; x < rows; x++) {
-        baubereich->at(x) = vector<Building>(columns);
-        for (int y = 0; y < columns; y++) {
-            baubereich->at(x).at(y) = Leer();
-        }
-    }
-}
-
-// print den Baubereich
-void CapycitySim::printBaubereich() {
-    // Ausdrucken des Plans mit Labels
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < columns; j++) {
-            cout << baubereich->at(i).at(j).label << "\t\t";
-        }
-        cout << "\n\n";
-    }
-    int gesamtpreisGebaeude = 0;
-    // Ausrucken der Liste von Gebäuden mit ihren Materialien+Einzelpreis
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < columns; j++) {
-            if (baubereich->at(i).at(j) != Leer()) {
-                cout << baubereich->at(i).at(j).label << ": " << baubereich->at(i).at(j).auflisten() << endl;
-                gesamtpreisGebaeude += baubereich->at(i).at(j).berechnePreis();
-            }
-        }
-    }
-    // Ausdrucken des Gesamtpreises
-    cout << "Gesamtpreis aller Gebaeude: " << gesamtpreisGebaeude << endl;
-}
+// Konstruktor
+CapycitySim::CapycitySim() {}
 
 // Enthällt die eigentliche Spiellogik
 void CapycitySim::start() {
@@ -57,17 +21,30 @@ void CapycitySim::start() {
     int auswahlMenu, auswahlGeb;
     bool running = true;
     bool beenden = false;
+    bool enthalten;
 
-    printBaubereich(); // Baubereich am Anfang ausgeben
+    int rows, columns;
+    // Eingabe der Größe des Feldes
+    cout << "Bitte Zeilen des Baubereichs eingeben: ";
+    cin >> rows;
+    cout << "Bitte Spalten des Baubereichs eingeben: ";
+    cin >> columns;
+    cout << endl;
+
+    Blueprint bp(rows, columns);
+
+    bp.printBaubereich(); // Baubereich am Anfang ausgeben
 
     // Menü
     while (running == true) {
 
-        cout << "Bitte waehle den naechsten Schritt:\n" << endl;
+        cout << "Bitte waehle den naechsten Schritt:" << endl;
         cout << "1. Gebaeude setzen" << endl;
         cout << "2. Bereich loeschen" << endl;
         cout << "3. Ausgabe des aktuellen Bauplans" << endl;
-        cout << "4. Beenden des Programms\n" << endl;
+        cout << "4. Erstellung eines neuen Plans" << endl;
+        cout << "5. Ausgabe aller Plaene" << endl;
+        cout << "6. Beenden des Programms" << endl << endl;
 
         cin >> auswahlMenu; // Eingabe vom Nutzer für die Menüauswahl
 
@@ -110,19 +87,19 @@ void CapycitySim::start() {
             // Liegt der Start überhaupt in meinem Baubereich?
             if (startRow >= rows || startRow < 0 || startColumn < 0 || startColumn >= columns) {
                 beenden = true;
-                cout << "Gebaeudegroeße ist unpassend\n";
+                cout << "Gebaeudegroesse ist unpassend\n";
             }
             // Wenn oben erfüllt, liegt es auch inkl. der Länge und Breite immernoch in meinem Baubereich?
-            if (beenden != true && (rows - hoehe) < 0 || (columns - breite) < 0) {
+            if (beenden != true && (startRow + hoehe) > rows || (startColumn + breite) > columns) {
                 beenden = true;
-                cout << "Gebaeudegroeße ist unpassend\n";
+                cout << "Gebaeudegroesse ist unpassend\n";
             }
             // wenn beenden noch false ist dann hat Gebäude passende Größe
             if (beenden == false) {
                 // prüfen ob Kollisonen mit anderen Gebäuden vorliegen
-                for (int i = startColumn; i < startColumn + hoehe; i++) {
-                    for (int j = startRow; j < startRow + breite; j++) {
-                        if (baubereich->at(i).at(j) != Leer()) {
+                for (int i = startRow; i < startRow + hoehe; i++) {
+                    for (int j = startColumn; j < startColumn + breite; j++) {
+                        if (bp.baubereich->at(i).at(j) != Leer()) {
                             cout << "Obacht Kollision mit anderem Gebaeude, Abbruch!\n";
                             beenden = true;
                             break;
@@ -138,9 +115,7 @@ void CapycitySim::start() {
             }
 
             // sonst Gebäude setzen
-            for (int i = startColumn; i < startColumn + hoehe; i++)
-                for (int j = startRow; j < startRow + breite; j++)
-                    baubereich->at(i).at(j) = geb;
+            bp.setzeGebaeude(geb, startRow, startColumn, breite, hoehe);
 
             beenden = false; // zurücksetzen von beenden
             break;
@@ -171,22 +146,55 @@ void CapycitySim::start() {
             }
 
             // Falls Bereich passt, dann zurücksetzen dieser Felder
-            if (beenden != true) {
-                for (int i = startColumn; i < startColumn + hoehe; i++)
-                    for (int j = startRow; j < startRow + breite; j++)
-                        baubereich->at(i).at(j) = Leer();
-            }
+            if (beenden != true)
+                bp.setzeGebaeude(Leer(), startRow, startColumn, breite, hoehe);
+
             beenden = false; // zurücksetzen von beenden
             break;
 
             //--------------- Auswahl Ausgabe des Bauplans-----------------------
         case 3:
             // Ausgabe des Baubereichs
-            printBaubereich();
+            bp.printBaubereich();
+            break;
+
+            //--------------- Auswahl Erstellung eines neuen Plans-----------------------
+        case 4:
+            enthalten = false;
+            // prüfen ob aktueller Plan schon vorhanden ist
+            for (int i = 0; i < plaene.size(); i++) {
+                if (bp(plaene[i]) == true) {
+                    cout << "Aktueller Plan ist bereits vorhanden, aktueller Plan wird verworfen!\n\n";
+                    enthalten = true;
+                    break;
+                }
+            }
+
+            // falls false, muss aktueller Plan im Vector gespeichert werden, ansonsten nicht
+            if (enthalten == false)
+                plaene.push_back(bp);
+
+            // erneute Eingabe der Größe des Feldes
+            cout << "Bitte Zeilen des Baubereichs eingeben: ";
+            cin >> rows;
+            cout << "Bitte Spalten des Baubereichs eingeben: ";
+            cin >> columns;
+            cout << endl;
+
+            // Hier resetten und wieder auf Leer setzen alles
+            bp.resetPlan(rows, columns);
+
+            bp.printBaubereich(); // Baubereich am Anfang ausgeben
+
+            break;
+
+            //--------------- Auswahl alle Pläne drucken-----------------------
+        case 5:
+            printAll();
             break;
 
             //--------------- Auswahl Programm beenden -----------------------
-        case 4:
+        case 6:
             cout << "Programm beendet\n" << endl;
             running = false;
             break;
@@ -194,3 +202,21 @@ void CapycitySim::start() {
 
     } // ende while loop
 }
+
+// Ausdrucken aller Pläne
+void CapycitySim::printAll() {
+
+    // Lambda Funktion zur absteigenden Sortierung anhand der Kennzahlen
+    //auto sortierLambda = [](Blueprint a, Blueprint b)->bool {
+      //  return a.kennzahl > b.kennzahl;
+    //};
+
+    sort(plaene.begin(), plaene.end(), [](Blueprint a, Blueprint b)->bool {
+        return a.kennzahl > b.kennzahl;
+        });
+
+    for (int i = 0; i < plaene.size(); i++) {
+        plaene[i].printBaubereich();
+    }
+}
+

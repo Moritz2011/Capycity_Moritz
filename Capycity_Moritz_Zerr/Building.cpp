@@ -1,7 +1,4 @@
-/*
-    Moritz Zerr
-    14.1.2023 Kapitel 3
-*/
+
 
 
 #include <string>
@@ -12,7 +9,7 @@ using namespace std;
 
 Building::Building() {};
 
-Building::Building(string l, int gp) :label(l), grundpreis(gp) {
+Building::Building(string l, int gp, int leist) :label(l), grundpreis(gp), leistung(leist) {
     gesamtpreisGebaeude = berechnePreis();
 }
 

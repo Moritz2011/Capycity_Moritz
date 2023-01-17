@@ -21,14 +21,19 @@ public:
     int grundpreis;
     int gesamtpreisGebaeude;
     string label;
+    int leistung;
     map<Material*, int> matMap; // Material* "besser" da wenn nur Material man < überladen müsste
 
     Building();
-    Building(string l, int gp);
+    Building(string l, int gp, int leist);
 
     int berechnePreis();
 
     string auflisten();
+
+    int getLeistung() {
+        return leistung;
+    }
 
     bool operator!=(const Building b);
 

@@ -1,19 +1,17 @@
 #pragma once
 
 
-#include <iostream>
-#include <vector>
-#include <map>
-#include "Building.h"
+#include<vector>
+#include "Blueprint.h"
 
 class CapycitySim {
-private:
-    vector<vector<Building> >* baubereich; // wird im Konstruktor erstellt
-    int rows, columns;
 public:
-    CapycitySim(int rows, int columns);
+    vector<Blueprint> plaene;
+
+    CapycitySim();
 
     void start();
-    void printBaubereich();
+
+    void printAll();
 
 };

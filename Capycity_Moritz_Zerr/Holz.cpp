@@ -1,7 +1,4 @@
-/*
-    Moritz Zerr
-    14.1.2023 Kapitel 3
-*/
+
 
 #include "Holz.h"
 
