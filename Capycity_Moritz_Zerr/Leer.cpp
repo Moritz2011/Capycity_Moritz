@@ -1,4 +1,7 @@
-
+/*
+    Moritz Zerr
+    14.1.2023 Kapitel 3
+*/
 
 #include "Building.h"
 #include "Leer.h"
@@ -11,4 +14,5 @@
 using namespace std;
 
 
-Leer::Leer() :Building("Leer", 0, {}) {}
+Leer::Leer() :Building("Leer", 0) {
+}

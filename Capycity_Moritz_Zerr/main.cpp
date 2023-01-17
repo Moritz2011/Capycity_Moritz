@@ -1,4 +1,9 @@
-
+/*
+    Moritz Zerr
+    13.1.2023 Kapitel 1
+    13.1.2023 und 14.1.2023 Kapitel 2
+    14.1.2023 Kapitel 3
+*/
 
 #include <iostream>
 #include <vector>

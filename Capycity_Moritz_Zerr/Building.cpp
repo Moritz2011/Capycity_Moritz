@@ -1,4 +1,7 @@
-
+/*
+    Moritz Zerr
+    14.1.2023 Kapitel 3
+*/
 
 
 #include <string>
@@ -8,25 +11,30 @@ using namespace std;
 
 
 Building::Building() {};
-Building::Building(string l, int gp, vector<Material> ma) :label(l), grundpreis(gp), matVec(ma) {
+
+Building::Building(string l, int gp) :label(l), grundpreis(gp) {
     gesamtpreisGebaeude = berechnePreis();
 }
 
 // Einzelpreis eines Gebäudes berechnen Grundpreis + Preise der Materialien
 int Building::berechnePreis() {
     int p = 0;
-    for (int i = 0; i < matVec.size(); i++)
-        p += matVec[i].preis;
+
+    for (auto iter = matMap.begin(); iter != matMap.end(); iter++) {
+        p += iter->first->preis * iter->second;
+    }
+
     return p + grundpreis;
 }
 
 // Materialien und Preis des Gebäudes auflisten -> string erstellen
 string Building::auflisten() {
     string liste = "Materialien: ";
-    for (int i = 0; i < matVec.size(); i++) {
-        liste += matVec[i].materialtyp;
-        liste += ", ";
+
+    for (auto iter = matMap.begin(); iter != matMap.end(); iter++) {
+        liste += iter->first->materialtyp + ", ";
     }
+
     liste += "Einzelpreis Gebaeude: ";
     liste += to_string(berechnePreis());
     return liste;
