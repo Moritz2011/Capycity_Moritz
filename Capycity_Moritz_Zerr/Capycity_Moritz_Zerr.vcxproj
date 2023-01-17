@@ -127,7 +127,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Building.cpp" />
+    <ClCompile Include="CapycitySim.cpp" />
+    <ClCompile Include="Holz.cpp" />
+    <ClCompile Include="Kunststoff.cpp" />
+    <ClCompile Include="Leer.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Material.cpp" />
+    <ClCompile Include="Metall.cpp" />
+    <ClCompile Include="Solarpanele.cpp" />
+    <ClCompile Include="Wasserkraftwerk.cpp" />
+    <ClCompile Include="Windkraftwerk.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Building.h" />
+    <ClInclude Include="CapycitySim.h" />
+    <ClInclude Include="Holz.h" />
+    <ClInclude Include="Kunststoff.h" />
+    <ClInclude Include="Leer.h" />
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="Metall.h" />
+    <ClInclude Include="Solarpanele.h" />
+    <ClInclude Include="Wasserkraftwerk.h" />
+    <ClInclude Include="Windkraftwerk.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
